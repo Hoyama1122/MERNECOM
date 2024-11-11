@@ -46,7 +46,7 @@ export const signup = async (req, res) => {
     const isFirstAccount = (await User.countDocuments()) === 0;
     req.body.role = isFirstAccount ? "admin" : "customer";
     const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).send("User already exists");
+    if (userExists) return res.status(400).json({ message: "User already exists" });
 
     const user = await User.create({
       name,
@@ -138,13 +138,13 @@ export const refreshToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken)
-      return res.status(401).send({ message: "No refresh token" });
+      return res.status(401).json({ message: "No refresh token" });
 
     const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
     const storedToken = await redis.get(`refreshToken:${decoded.userId}`);
 
     if (storedToken !== refreshToken)
-      return res.status(401).send({ message: "Invalid refresh token" });
+      return res.status(401).json({ message: "Invalid refresh token" });
    
 
     const accessToken = jwt.sign(
@@ -161,7 +161,7 @@ export const refreshToken = async (req, res) => {
 
     res.send({ message: "Token refreshed successfully" });
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 

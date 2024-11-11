@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors"; // Import cors
 import dotenv from "dotenv";
 import { ConnectDB } from "./lib/db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -9,15 +10,21 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import Analytics from "./routes/Analytics.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
+
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", CartRoutes);
